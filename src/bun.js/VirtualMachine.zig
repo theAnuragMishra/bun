@@ -1073,7 +1073,7 @@ pub fn initWithModuleGraph(
     vm.body_value_hive_allocator = Body.Value.HiveAllocator.init(bun.typedAllocator(jsc.WebCore.Body.Value));
 
     // Install debug handler for runtime inspector activation (main thread only)
-    if (opts.is_main_thread) {
+    if (opts.is_main_thread and !opts.disable_sigusr1) {
         jsc.EventLoop.RuntimeInspector.installIfNotAlready();
     }
 
@@ -1103,6 +1103,8 @@ pub const Options = struct {
     /// Worker VMs are always destroyed on exit, regardless of this setting. Setting this to
     /// true may expose bugs that would otherwise only occur using Workers.
     destruct_main_thread_on_exit: bool = false,
+    /// Disable SIGUSR1 handler for runtime debugger activation (matches Node.js).
+    disable_sigusr1: bool = false,
 };
 
 pub var is_smol_mode = false;
@@ -1205,7 +1207,7 @@ pub fn init(opts: Options) !*VirtualMachine {
     vm.body_value_hive_allocator = Body.Value.HiveAllocator.init(bun.typedAllocator(jsc.WebCore.Body.Value));
 
     // Install debug handler for runtime inspector activation (main thread only)
-    if (opts.is_main_thread) {
+    if (opts.is_main_thread and !opts.disable_sigusr1) {
         jsc.EventLoop.RuntimeInspector.installIfNotAlready();
     }
 
@@ -1460,7 +1462,7 @@ pub fn initBake(opts: Options) anyerror!*VirtualMachine {
     vm.body_value_hive_allocator = Body.Value.HiveAllocator.init(bun.typedAllocator(jsc.WebCore.Body.Value));
 
     // Install debug handler for runtime inspector activation (main thread only)
-    if (opts.is_main_thread) {
+    if (opts.is_main_thread and !opts.disable_sigusr1) {
         jsc.EventLoop.RuntimeInspector.installIfNotAlready();
     }
 
